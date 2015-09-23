@@ -124,31 +124,57 @@ proc.time() - ptm
 # so I'll try building a bunch of smaller data.frames and rbinding
 
 
+#lags <- NULL
+#lags <- data.frame(state=factor(), route=factor(), year1=integer(), year2=integer(), obs1=factor(), obs2=factor(), species=factor(), count1=integer(), count2=integer())
+#
+#ptm <- proc.time()
+#for(i in 1:100){
+#  print(i)
+#  if(num.lags[i] != 0){
+#    lagsi <- as.data.frame(matrix(data=NA, nrow=num.lags[i], ncol=9))
+#    colnames(lagsi) <- c("state", "route", "year1", "year2", "obs1", "obs2", "species", "count1", "count2")
+#    p <- which(good_data$routespec==routespecs[i])
+#    n <- length(p)
+#    tt <- 0
+#    for(k in 1:(n-1)){
+#      for(j in (k+1):n){
+#        tt <- tt+1
+#        lagsi[tt, ] <- c(good_data$statenum.x[p[k]], 
+#                         good_data$Route.x[p[k]], 
+#                         good_data$year[p[k]], good_data$year[p[j]], 
+#                         good_data$ObsN[p[k]], good_data$ObsN[p[j]], 
+#                         good_data$AOU[p[k]], 
+#                         good_data$Abundance[p[k]], good_data$Abundance[p[j]])
+#      }
+#    }
+#    lags <- rbind(lags, lagsi)
+#  }
+#}
+#proc.time() -  ptm
+
+
+
 lags <- NULL
-lags.list <- list()
+lags.list <- vector(mode = "list", length = sum(num.lags))
 
 ptm <- proc.time()
-for(i in 1:length(num.lags)){
+tt <- 0
+for(i in 1:100){
   print(i)
-  print(length(num.lags))
   if(num.lags[i] != 0){
-    lagsi <- as.data.frame(matrix(data=NA, nrow=num.lags[i], ncol=9))
-    colnames(lagsi) <- c("state", "route", "year1", "year2", "obs1", "obs2", "species", "count1", "count2")
     p <- which(good_data$routespec==routespecs[i])
     n <- length(p)
-    tt <- 0
     for(k in 1:(n-1)){
       for(j in (k+1):n){
         tt <- tt+1
-        lagsi[tt, ] <- c(good_data$statenum.x[p[k]], 
-                         good_data$Route.x[p[k]], 
-                         good_data$year[p[k]], good_data$year[p[j]], 
-                         good_data$ObsN[p[k]], good_data$ObsN[p[j]], 
-                         good_data$AOU[p[k]], 
-                         good_data$Abundance[p[k]], good_data$Abundance[p[j]])
+        lags.list[[tt]] <- c(good_data$statenum.x[p[k]], 
+                             good_data$Route.x[p[k]], 
+                             good_data$year[p[k]], good_data$year[p[j]], 
+                             good_data$ObsN[p[k]], good_data$ObsN[p[j]], 
+                             good_data$AOU[p[k]], 
+                             good_data$Abundance[p[k]], good_data$Abundance[p[j]])
       }
     }
-    lags.list[[i]] <- lagsi
   }
 }
 proc.time() -  ptm
