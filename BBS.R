@@ -8,6 +8,8 @@ Nlags <- function(p2){
   nl <- n*(n-1)/2
   return(nl)
 }
+
+
 ##### Part I: Merging data from the 50 states #####
 # This script is written in a way that lets us run it from either of our  
 # computers without modification. Instead of reading in locally
@@ -102,6 +104,7 @@ for(i in 1:length(routespecs)){
 }
 proc.time() - ptm
 # Elapsed time on above for-loop was 18194 seconds.
+num.lags <- num.lags[2:length(num.lags)]
 
 # By the way, the below code did not speed things up much--efficiency gain
 # of ~2%.  It does produce the same result, at least.
@@ -114,13 +117,36 @@ proc.time() - ptm
 lags <- as.data.frame(matrix(data=NA, nrow=sum(num.lags), ncol=9))
 colnames(lags) <- c("state", "route", "year1", "year2", "obs1", "obs2", "species", "count1", "count2")
 
-for(k in 1:max(num.lags)){
-  for(i in 2:51){
-    if(num.lags(i) >= k){
-      p <- which(good_data$routespec==routespecs[i])
-      for(j in 1:num.lags(i)){
-      
+ptm <- proc.time()
+lags[5000000,] <- c(1,2,3,4,5,6,7,8,9)
+proc.time() - ptm
+# just writing a single row to lags takes almost 7 seconds!!!  Holy crap.
+# so I'll try building a bunch of smaller data.frames and rbinding
+
+
+lags <- NULL
+lags <- data.frame(state=factor(), route=factor(), year1=integer(), year2=integer(), obs1=factor(), obs2=factor(), species=factor(), count1=integer(), count2=integer())
+
+ptm <- proc.time()
+for(i in 1:length(num.lags)){
+  if(num.lags[i] != 0){
+    lagsi <- as.data.frame(matrix(data=NA, nrow=num.lags[i], ncol=9))
+    colnames(lagsi) <- c("state", "route", "year1", "year2", "obs1", "obs2", "species", "count1", "count2")
+    p <- which(good_data$routespec==routespecs[i])
+    n <- length(p)
+    tt <- 0
+    for(k in 1:(n-1)){
+      for(j in (k+1):n){
+        tt <- tt+1
+        lagsi[tt, ] <- c(good_data$statenum.x[p[k]], 
+                         good_data$Route.x[p[k]], 
+                         good_data$year[p[k]], good_data$year[p[j]], 
+                         good_data$ObsN[p[k]], good_data$ObsN[p[j]], 
+                         good_data$AOU[p[k]], 
+                         good_data$Abundance[p[k]], good_data$Abundance[p[j]])
       }
     }
+    lags <- rbind(lags, lagsi)
   }
 }
+proc.time() -  ptm
