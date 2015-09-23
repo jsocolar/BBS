@@ -75,6 +75,22 @@ full <- merge(all_data, rweather, by = "uniqueID")
 good_data <- full[which(full$RunType==1), ]
 
 ##### Part II: Extracting the lags #####
+# For each route/species combination, let n be the number of corresponding 
+# lines in good_data.  Then there will be n*(n-1)/2 lags associated with that
+# route/species combination.
 
+# Give each route/species combo a unique identifier
+summary(good_data$Route.x)
+summary(good_data$AOU)
+summary(good_data$statenum.x)
+good_data$routespec <- good_data$AOU + good_data$Route.x/1000 + good_data$statenum.x*1000000
+routespecs <- unique(good_data$routespec)
+length(routespecs)
 
-
+num.lags <- 0
+ptm <- proc.time()
+for(i in 1:length(routespecs)){
+  n <- length(which(good_data$routespec==routespecs[i]))
+  num.lags <- c(num.lags, n*(n-1)/2)
+}
+proc.time() - ptm
