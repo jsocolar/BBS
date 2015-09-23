@@ -65,7 +65,8 @@ rweather <- rweather[which(rweather$RPID==101),]
 # Only one value of these columns exists in all_data, so we don't have to worry
 # about these
 
-# Give each combo of statenum, Route, and year a unique combination
+# Give each combo of statenum, Route, and year a unique combination. Inspiration
+# for doing this came from Gödel numbering :)
 rweather$uniqueID <- rweather$statenum/100 + rweather$Route + 1000*rweather$Year
 all_data$uniqueID <- all_data$statenum/100 + all_data$Route + 1000*all_data$year
 
@@ -94,3 +95,4 @@ for(i in 1:length(routespecs)){
   num.lags <- c(num.lags, n*(n-1)/2)
 }
 proc.time() - ptm
+# Elapsed time on above for-loop was 18194 seconds.
