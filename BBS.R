@@ -125,10 +125,12 @@ proc.time() - ptm
 
 
 lags <- NULL
-lags <- data.frame(state=factor(), route=factor(), year1=integer(), year2=integer(), obs1=factor(), obs2=factor(), species=factor(), count1=integer(), count2=integer())
+lags.list <- list()
 
 ptm <- proc.time()
 for(i in 1:length(num.lags)){
+  print(i)
+  print(length(num.lags))
   if(num.lags[i] != 0){
     lagsi <- as.data.frame(matrix(data=NA, nrow=num.lags[i], ncol=9))
     colnames(lagsi) <- c("state", "route", "year1", "year2", "obs1", "obs2", "species", "count1", "count2")
@@ -146,7 +148,7 @@ for(i in 1:length(num.lags)){
                          good_data$Abundance[p[k]], good_data$Abundance[p[j]])
       }
     }
-    lags <- rbind(lags, lagsi)
+    lags.list[[i]] <- lagsi
   }
 }
 proc.time() -  ptm
