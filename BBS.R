@@ -3,9 +3,10 @@
 library(RCurl)
 
 ##### Part I: Merging data from the 50 states #####
-# This script is written in a way that lets us run it without 
-# modification from either of our computers. Instead of reading in locally
-# stored files, I read the files directly in from the github website.
+# This script is written in a way that lets us run it from either of our  
+# computers without modification. Instead of reading in locally
+# stored files (which will inevitably have different filenames on our different
+# machines), I read in the files directly from the github website.
 # This requires some tinkering because read.csv doesn't know how to interact
 # with https.
 
@@ -36,4 +37,44 @@ for(i in 2:length(states)){
 all_clean <- all_states[which(all_states$RPID == 101),]
 # This limits us to just the first run in a year, and only standard run protocols
 # see <ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/RunProtocolID.txt>
+
+## Now we bring in more route covariates
+wURL <- getURL('https://raw.githubusercontent.com/jsocolar/BBS/master/weather.csv')
+weather <- as.data.frame(read.csv(text = wURL))
+dfr <- as.data.frame(matrix(data=NA, nrow=dim(all_clean)[1], ncol=dim(weather)[2]-5))
+cc <- c(1, 7:dim(weather)[2])
+colnames(dfr) <- colnames(weather)[cc]
+all_data <- cbind(all_clean, dfr)
+
+# ptm <- proc.time()
+# for(i in 1:500){
+#  all_data[i,14:29] <-
+#           weather[which(weather$countrynum==all_data$countrynum[i] & 
+#                           weather$statenum==all_data$statenum[i] & 
+#                           weather$Route==all_data$Route[i] & 
+#                           weather$RPID==all_data$RPID[i] & 
+#                           weather$Year==all_data$year[i]), cc]
+#}
+#proc.time()-ptm
+# NOTE, the above code took 318 seconds to complete, meaning that looping to 
+# i ==  5000000 would take a month.  Need to find a much more efficient way
+# to do this...
+
+rweather <- weather[which(weather$countrynum==840),]
+rweather <- rweather[which(rweather$RPID==101),]
+# Only one value of these columns exists in all_data, so we don't have to worry
+# about these
+
+# Give each combo of statenum, Route, and year a unique combination
+rweather$uniqueID <- rweather$statenum/100 + rweather$Route + 1000*rweather$Year
+all_data$uniqueID <- all_data$statenum/100 + all_data$Route + 1000*all_data$year
+
+all_data <- all_data[ , c(1:13, 30)]
+
+full <- merge(all_data, rweather, by = "uniqueID")
+good_data <- full[which(full$RunType==1), ]
+
+##### Part II: Extracting the lags #####
+
+
 
