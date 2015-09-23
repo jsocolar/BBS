@@ -2,6 +2,12 @@
 
 library(RCurl)
 
+##### Useful functions #####
+Nlags <- function(p2){
+  n <- length(which(good_data$routespec==p2))
+  nl <- n*(n-1)/2
+  return(nl)
+}
 ##### Part I: Merging data from the 50 states #####
 # This script is written in a way that lets us run it from either of our  
 # computers without modification. Instead of reading in locally
@@ -96,3 +102,25 @@ for(i in 1:length(routespecs)){
 }
 proc.time() - ptm
 # Elapsed time on above for-loop was 18194 seconds.
+
+# By the way, the below code did not speed things up much--efficiency gain
+# of ~2%.  It does produce the same result, at least.
+#ptm <- proc.time()
+#test <- lapply(routespecs[1:500], Nlags)
+#proc.time()-ptm
+
+
+# Define and preallocate space in a dataframe to hold the lags
+lags <- as.data.frame(matrix(data=NA, nrow=sum(num.lags), ncol=9))
+colnames(lags) <- c("state", "route", "year1", "year2", "obs1", "obs2", "species", "count1", "count2")
+
+for(k in 1:max(num.lags)){
+  for(i in 2:51){
+    if(num.lags(i) >= k){
+      p <- which(good_data$routespec==routespecs[i])
+      for(j in 1:num.lags(i)){
+      
+      }
+    }
+  }
+}
