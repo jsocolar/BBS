@@ -6,10 +6,12 @@ library(mapdata)
 library(RCurl)
 
 ## Upload route file
-routes <- read.csv("Princeton/Socolar - Washburne/BBS and Land Use Changes/Data/BBS Data and Documents/routes.csv")
-# Need to replace this with the URL on our github file
+rURL <- getURL('https://raw.githubusercontent.com/jsocolar/BBS/master/Mapping%2C%20Spatial%20Analysis%20and%20Visualization/routes.csv')
+routes <- as.data.frame(read.csv(text = rURL))
 
-## Demo for how to plot on maps. map() needs to be done first to create the map object, on which we can attach points and, eventually, polygons for land-use change
+## Demo for how to plot on maps. map() needs to be done first to create the 
+# map object, on which we can attach points and, eventually, polygons for 
+# land-use change
 map("worldHires",c("USA","Canada"), xlim=c(-170,-50), ylim=c(25,80), col="gray90", fill=TRUE)
 points(routes$Longi[routes$Active==1], routes$Lati[routes$Active==1],pch=19, col="blue",cex=0.5)
 points(routes$Longi[routes$Active==0], routes$Lati[routes$Active==0],pch=19, col="red",cex=0.5)
