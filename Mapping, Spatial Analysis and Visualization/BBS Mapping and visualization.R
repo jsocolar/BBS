@@ -9,6 +9,7 @@ library(RCurl)
 rURL <- getURL('https://raw.githubusercontent.com/jsocolar/BBS/master/Mapping%2C%20Spatial%20Analysis%20and%20Visualization/routes.csv')
 routes <- as.data.frame(read.csv(text = rURL))
 
+
 ## Demo for how to plot on maps. map() needs to be done first to create the 
 # map object, on which we can attach points and, eventually, polygons for 
 # land-use change
